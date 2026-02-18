@@ -20,9 +20,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pandas numpy yfinance lxml
-      - name: Generate JSON
-        run: |
-          python actualizacion_sp500.py
+      - - nombre: Generar JSON
+  correr: |
+    python actualizacion_sp500.py
       - name: Commit and push
         run: |
           git config user.name "sp500-bot"
