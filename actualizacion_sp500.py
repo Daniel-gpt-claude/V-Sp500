@@ -77,10 +77,15 @@ def get_sp500_constituents():
     response.raise_for_status()
 
     tables = pd.read_html(response.text)
-    df = tables [0]
+    df = tables[0]
 
-return df
+    df = df.rename(columns={
+        "Symbol": "ticker",
+        "Security": "company",
+        "GICS Sector": "sector"
+    })
 
+    return df[["ticker", "company", "sector"]]
 
 def score_row(rsi, price_vs_ma50, relvol, ret1m, ret3m, ret1y):
   # Score simple (técnico) para ordenar “lo más atractivo” dentro del filtro.
