@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>S&P 500 Momentum Screener</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#111827" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <div class="title">
+      <h1>S&P 500 Momentum Screener</h1>
+      <p class="sub">RSI 55–65 · Precio &gt; MA50 · RelVol ≥ 1.2 · 3M &gt; 0 · %vsMA50 ≤ 15</p>
+    </div>
+    <div class="meta">
+      <div id="lastUpdate">Actualización: —</div>
+      <button id="refreshBtn">Recargar</button>
+    </div>
+  </header>
+
+  <section class="controls">
+    <input id="search" placeholder="Buscar ticker o empresa…" />
+    <select id="sector"></select>
+    <label class="chk"><input type="checkbox" id="onlyPass" checked /> Solo pasan filtro</label>
+  </section>
+
+  <section class="tableWrap">
+    <table id="tbl">
+      <thead>
+        <tr>
+          <th data-sort="score">Score</th>
+          <th data-sort="ticker">Ticker</th>
+          <th data-sort="company">Empresa</th>
+          <th data-sort="sector">Sector</th>
+          <th data-sort="price">Precio</th>
+          <th data-sort="rsi">RSI</th>
+          <th data-sort="ma50">MA50</th>
+          <th data-sort="p_vs_ma50">% vs MA50</th>
+          <th data-sort="ret3m">3M%</th>
+          <th data-sort="relvol">RelVol</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <footer>
+    <p class="footnote">Fuente de prueba: Yahoo Finance (vía yfinance). Úsalo como radar, no como verdad absoluta.</p>
+  </footer>
+
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+  </script>
+</body>
+</html>
