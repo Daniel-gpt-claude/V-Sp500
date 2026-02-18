@@ -2,9 +2,9 @@ import json
 import math
 from datetime import datetime, timezone
 
-import pandas as pd
 import requests
-import traceback
+import pandas as pd
+from bs4 import BeautifulSoup
 
 # =========================
 # Configuración
@@ -73,31 +73,30 @@ def get_sp500_constituents():
         "Accept-Language": "en-US,en;q=0.9",
     }
 
-    try:
-        r = requests.get(SP500_WIKI_URL, headers=headers, timeout=30)
-        print("WIKI status:", r.status_code)
-        r.raise_for_status()
+    r = requests.get(SP500_WIKI_URL, headers=headers, timeout=30)
+    print("WIKI status:", r.status_code)
+    r.raise_for_status()
 
-        # Forzamos lxml (más estable para read_html en CI)
-        tables = pd.read_html(r.text, flavor="lxml", match="Symbol")
-        df = tables[0]
+    soup = BeautifulSoup(r.text, "lxml")
 
-        # Normaliza columnas a lo que tu main espera
-        df = df.rename(columns={
-            "Symbol": "ticker",
-            "Security": "company",
-            "GICS Sector": "sector",
-        })
+    # La tabla correcta en Wikipedia suele tener id="constituents"
+    table = soup.find("table", {"id": "constituents"})
+    if table is None:
+        # fallback: primera tabla con clase wikitable sortable
+        table = soup.find("table", {"class": "wikitable"})
+    if table is None:
+        raise RuntimeError("No encontré la tabla de constituyentes en Wikipedia.")
 
-        return df[["ticker", "company", "sector"]]
+    df = pd.read_html(str(table))[0]
 
-    except Exception as e:
-        print("ERROR leyendo Wikipedia:", repr(e))
-        print("Primeros 500 chars del HTML (debug):")
-        print(r.text[:500] if 'r' in locals() else "No response")
-        print("TRACEBACK:")
-        traceback.print_exc()
-        raise
+    df = df.rename(columns={
+        "Symbol": "ticker",
+        "Security": "company",
+        "GICS Sector": "sector",
+    })
+
+    return df[["ticker", "company", "sector"]]
+
 
 
 def score_row(rsi, price_vs_ma50, relvol, ret1m, ret3m, ret1y):
