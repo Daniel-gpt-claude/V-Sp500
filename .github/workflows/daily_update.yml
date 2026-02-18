@@ -22,7 +22,7 @@ jobs:
           pip install pandas numpy yfinance lxml
       - name: Generate JSON
         run: |
-          python actualización_sp500.py
+          python actualizacion_sp500.py
       - name: Commit and push
         run: |
           git config user.name "sp500-bot"
