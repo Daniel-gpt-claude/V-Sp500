@@ -2,6 +2,7 @@ name: Daily SP500 update
 
 on:
   schedule:
+    # 13:10 UTC, Monday–Friday
     - cron: "10 13 * * 1-5"
   workflow_dispatch:
 
@@ -29,8 +30,13 @@ jobs:
 
       - name: Commit and push
         run: |
+          mkdir -p data
+          # El script genera sp500_momentum.json en la raíz; lo movemos a /data como lo pide la app
+          mv -f sp500_momentum.json data/sp500_momentum.json
+
           git config user.name "sp500-bot"
           git config user.email "sp500-bot@users.noreply.github.com"
-          git add sp500_momentum.json
+
+          git add data/sp500_momentum.json
           git commit -m "Daily update sp500_momentum.json" || echo "Sin cambios"
           git push
