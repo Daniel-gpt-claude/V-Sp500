@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 import numpy as np
 import pandas as pd
 import yfinance as yf
+import request
 
 
 # =========================
@@ -67,20 +68,18 @@ def pct_change_over(close: pd.Series, days: int) -> float | None:
     return None
   return float((b / a) - 1.0)
 
+def get_sp500_constituents():
+    headers = {
+        "User-Agent": "Mozilla/5.0"
+    }
 
-def get_sp500_constituents() -> pd.DataFrame:
-  tables = pd.read_html(SP500_WIKI_URL)
-  # La primera tabla suele ser la de componentes
-  df = tables[0].copy()
-  # Normalizamos columnas típicas
-  # Symbol, Security, GICS Sector
-  df.rename(columns={
-    "Symbol": "ticker",
-    "Security": "company",
-    "GICS Sector": "sector"
-  }, inplace=True)
-  df["ticker"] = df["ticker"].astype(str).str.replace(".", "-", regex=False)  # BRK.B -> BRK-B
-  return df[["ticker", "company", "sector"]]
+    response = requests.get(SP500_WIKI_URL, headers=headers, timeout=30)
+    response.raise_for_status()
+
+    tables = pd.read_html(response.text)
+    df = tables [0]
+
+return df
 
 
 def score_row(rsi, price_vs_ma50, relvol, ret1m, ret3m, ret1y):
