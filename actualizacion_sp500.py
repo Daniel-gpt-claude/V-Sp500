@@ -2,11 +2,9 @@ import json
 import math
 from datetime import datetime, timezone
 
-import numpy as np
 import pandas as pd
-import yfinance as yf
 import requests
-
+import traceback
 
 # =========================
 # Configuración
@@ -68,24 +66,39 @@ def pct_change_over(close: pd.Series, days: int) -> float | None:
     return None
   return float((b / a) - 1.0)
 
+
 def get_sp500_constituents():
     headers = {
-        "User-Agent": "Mozilla/5.0"
+        "User-Agent": "Mozilla/5.0",
+        "Accept-Language": "en-US,en;q=0.9",
     }
 
-    response = requests.get(SP500_WIKI_URL, headers=headers, timeout=30)
-    response.raise_for_status()
+    try:
+        r = requests.get(SP500_WIKI_URL, headers=headers, timeout=30)
+        print("WIKI status:", r.status_code)
+        r.raise_for_status()
 
-    tables = pd.read_html(response.text)
-    df = tables[0]
+        # Forzamos lxml (más estable para read_html en CI)
+        tables = pd.read_html(r.text, flavor="lxml", match="Symbol")
+        df = tables[0]
 
-    df = df.rename(columns={
-        "Symbol": "ticker",
-        "Security": "company",
-        "GICS Sector": "sector"
-    })
+        # Normaliza columnas a lo que tu main espera
+        df = df.rename(columns={
+            "Symbol": "ticker",
+            "Security": "company",
+            "GICS Sector": "sector",
+        })
 
-    return df[["ticker", "company", "sector"]]
+        return df[["ticker", "company", "sector"]]
+
+    except Exception as e:
+        print("ERROR leyendo Wikipedia:", repr(e))
+        print("Primeros 500 chars del HTML (debug):")
+        print(r.text[:500] if 'r' in locals() else "No response")
+        print("TRACEBACK:")
+        traceback.print_exc()
+        raise
+
 
 def score_row(rsi, price_vs_ma50, relvol, ret1m, ret3m, ret1y):
   # Score simple (técnico) para ordenar “lo más atractivo” dentro del filtro.
