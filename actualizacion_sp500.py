@@ -37,7 +37,7 @@ VOL_PERIOD = 20
 
 OUT_FILE_ROOT = "sp500.json"
 ...
-df.to_json(OUT_FILE_ROOT, orient="records"
+df.to_json(OUT_FILE_ROOT, orient="records")
 
 
 # =========================
