@@ -2,15 +2,27 @@ import json
 import math
 from datetime import datetime, timezone
 
-import requests
 import pandas as pd
-from bs4 import BeautifulSoup
+import requests
+import numpy as np
 
 # =========================
 # Configuración
 # =========================
 
-SP500_WIKI_URL = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
+url = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
+
+headers = {
+  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36"
+}
+
+response = requests.get(url, headers=headers, timeout=30)
+response.raise_for_status()
+
+tables = pd.read_html(response.text)
+
+df = tables[0]
+
 
 # Filtros (los mismos que tu UI muestra arriba)
 RSI_MIN = 55
@@ -23,7 +35,9 @@ RSI_PERIOD = 14
 MA_PERIOD = 50
 VOL_PERIOD = 20
 
-OUT_FILE_ROOT = "sp500_momentum.json"
+OUT_FILE_ROOT = "sp500.json"
+...
+df.to_json(OUT_FILE_ROOT, orient="records"
 
 
 # =========================
