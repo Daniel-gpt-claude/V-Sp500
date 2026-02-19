@@ -1,1 +1,5 @@
-
+pandas
+requests
+numpy
+html5lib
+beautifulsoup4
