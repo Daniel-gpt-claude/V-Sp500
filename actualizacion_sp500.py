@@ -19,7 +19,7 @@ headers = {
 response = requests.get(url, headers=headers, timeout=30)
 response.raise_for_status()
 
-tables = pd.read_html(response.text)
+tables = pd.read_html(response.text, flavor="html5lib")
 
 df = tables[0]
 
