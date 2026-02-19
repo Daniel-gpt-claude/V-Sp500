@@ -24,19 +24,19 @@ jobs:
     python -m pip install --upgrade pip
     pip install -r requirements.txt
 
-      - name: Generate JSON
-        run: |
-          python actualizacion_sp500.py
+- name: Generate JSON
+  run: |
+    python actualizacion_sp500.py
 
-      - name: Move JSON to frontend folder
-        run: |
-          mkdir -p data
-          mv sp500_momentum.json data/sp500_momentum.json
+- name: Move JSON to frontend folder
+  run: |
+    mkdir -p data
+    mv sp500_momentum.json data/sp500_momentum.json
 
-      - name: Commit and push
-        run: |
-          git config user.name "sp500-bot"
-          git config user.email "sp500-bot@users.noreply.github.com"
-          git add data/sp500_momentum.json
-          git commit -m "Daily update sp500_momentum.json" || echo "Sin cambios"
-          git push
+- name: Commit and push
+  run: |
+    git config user.name "sp500-bot"
+    git config user.email "sp500-bot@users.noreply.github.com"
+    git add data/sp500_momentum.json
+    git commit -m "Daily update sp500_momentum.json" || echo "No changes"
+    git push
